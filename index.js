@@ -8,6 +8,8 @@ let todayDDMMYYYY = today.toLocaleDateString();
 
 let jobsPDF = new PDFGenerator;
 
+const sgMail = require('@sendgrid/mail');
+
 
 
 (async () => {
@@ -16,8 +18,7 @@ let jobsPDF = new PDFGenerator;
   await page.goto('https://araras.sp.gov.br/pat/');
   const filterBar = 'input[type=search]';
   await page.click(filterBar);
-  
-  await page.$eval(filterBar, el => el.value = 'auxiliar')
+  await page.$eval(filterBar, el => el.value = 'geral')
   await page.keyboard.press("Enter");
 
   const jobList = await page.evaluate(() => {
@@ -55,6 +56,31 @@ let jobsPDF = new PDFGenerator;
   jobsPDF.end();
 
   console.log('Arquivo gerado com sucesso!')
+
+  let newPath = './Vagas.pdf';
+
+  sgMail.setApiKey("YOUR_API_KEY");
+    let fileToBeSended = newPath;
+    let attachment = fs.readFileSync(fileToBeSended).toString("base64");
+    
+    const msg = {
+        to: 'TO_EMAIL',
+        from: 'FROM_EMAIL',
+        subject: `Vagas PAT - ${todayDDMMYYYY}`,
+        text: `Vagas do PAT Araras referentes a: geral!`,
+        attachments: [
+            {
+              content: attachment,
+              filename: "Vagas PAT.pdf",
+              type: "application/pdf",
+              disposition: "attachment"
+            }
+          ]
+    };
+    
+    await sgMail.send(msg).catch(err => {
+        console.log(err)
+    });
 
   await browser.close();
 })();

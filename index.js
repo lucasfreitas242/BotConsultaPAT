@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const PDFGenerator = require('pdfkit')
-const readline = require('readline');
 const timeElapsed = Date.now();
 const today = new Date(timeElapsed);
 
@@ -18,7 +17,7 @@ let jobsPDF = new PDFGenerator;
   const filterBar = 'input[type=search]';
   await page.click(filterBar);
   
-  await page.$eval(filterBar, el => el.value = 'sistemas')
+  await page.$eval(filterBar, el => el.value = 'auxiliar')
   await page.keyboard.press("Enter");
 
   const jobList = await page.evaluate(() => {
